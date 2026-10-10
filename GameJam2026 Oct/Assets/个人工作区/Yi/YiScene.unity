@@ -447,8 +447,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78cd9b2e3dc04a243830e6fd4dfb60c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProgrammingManager
-  bigCapacity: 8
-  smallCapacity: 6
+  bigTotalSlots: 8
+  bigUnlockedSlots: 8
+  smallTotalSlots: 6
+  smallUnlockedSlots: 4
 --- !u!1 &401986334
 GameObject:
   m_ObjectHideFlags: 0
@@ -2203,9 +2205,10 @@ MonoBehaviour:
   manager: {fileID: 378198404}
   bigPanel: {fileID: 1565052445}
   smallPanel: {fileID: 995185118}
-  bigGrid: {fileID: 1565052442}
-  smallGrid: {fileID: 995185117}
-  slotPrefab: {fileID: 6355992394842373802, guid: d1349848fecc25c4f9373594088e0189, type: 3}
+  commandSlotPrefab: {fileID: 6355992394842373802, guid: d1349848fecc25c4f9373594088e0189, type: 3}
+  lockedSlotPrefab: {fileID: 163266105424043437, guid: fdfa7605508269c4b928ae11435ec993, type: 3}
+  selectedColor: {r: 0.15, g: 0.55, b: 0.4, a: 1}
+  normalColor: {r: 0.27, g: 0.27, b: 0.27, a: 1}
 --- !u!1 &1565052441
 GameObject:
   m_ObjectHideFlags: 0

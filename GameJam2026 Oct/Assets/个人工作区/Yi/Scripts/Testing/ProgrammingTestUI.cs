@@ -9,16 +9,22 @@ public class ProgrammingTestUI : MonoBehaviour
     [Header("Programming")]
     [SerializeField] private ProgrammingManager manager;
 
-    [Header("Clickable Package Panels")]
+    [Header("Clickable Panels")]
     [SerializeField] private Button bigPanel;
     [SerializeField] private Button smallPanel;
 
-    [Header("Grid Containers")]
-    [SerializeField] private Transform bigGrid;
-    [SerializeField] private Transform smallGrid;
+    [Header("Prefabs")]
+    [SerializeField] private GameObject commandSlotPrefab;
+    [SerializeField] private GameObject lockedSlotPrefab;
 
-    [Header("Slot Prefab")]
-    [SerializeField] private GameObject slotPrefab;
+    [Header("Test Selection Colors")]
+    [SerializeField]
+    private Color selectedColor =
+        new Color(0.15f, 0.55f, 0.4f, 1f);
+
+    [SerializeField]
+    private Color normalColor =
+        new Color(0.27f, 0.27f, 0.27f, 1f);
 
     private readonly List<TMP_Text> bigTexts =
         new List<TMP_Text>();
@@ -40,17 +46,30 @@ public class ProgrammingTestUI : MonoBehaviour
 
     private void Start()
     {
-        if (manager == null || bigPanel == null ||
-            smallPanel == null || bigGrid == null ||
-            smallGrid == null || slotPrefab == null)
+        if (manager == null ||
+            bigPanel == null ||
+            smallPanel == null ||
+            commandSlotPrefab == null ||
+            lockedSlotPrefab == null)
         {
-            Debug.LogError("Missing UI references!");
+            Debug.LogError("Missing Programming UI references!");
             enabled = false;
             return;
         }
 
-        CreateSlots(bigGrid, 8, bigTexts);
-        CreateSlots(smallGrid, 6, smallTexts);
+        CreateSlots(
+            bigPanel.transform,
+            manager.BigTotalSlots,
+            manager.BigCapacity,
+            bigTexts
+        );
+
+        CreateSlots(
+            smallPanel.transform,
+            manager.SmallTotalSlots,
+            manager.SmallCapacity,
+            smallTexts
+        );
 
         bigPanel.onClick.AddListener(SelectBig);
         smallPanel.onClick.AddListener(SelectSmall);
@@ -69,32 +88,63 @@ public class ProgrammingTestUI : MonoBehaviour
 
     private void CreateSlots(
         Transform parent,
-        int count,
+        int total,
+        int unlocked,
         List<TMP_Text> texts)
     {
-        for (int i = 0; i < count; i++)
+        texts.Clear();
+
+        for (int i = 0; i < total; i++)
         {
-            GameObject slot = Instantiate(slotPrefab, parent);
-            slot.name = "Slot_" + (i + 1);
+            bool locked = i >= unlocked;
 
-            Image image = slot.GetComponent<Image>();
+            GameObject prefab =
+                locked ? lockedSlotPrefab : commandSlotPrefab;
 
-            if (image != null)
-                image.raycastTarget = false;
+            GameObject slot =
+                Instantiate(prefab, parent, false);
 
-            TMP_Text text =
-                slot.GetComponentInChildren<TMP_Text>();
+            slot.name = locked
+                ? "LockedSlot_" + (i + 1)
+                : "Slot_" + (i + 1);
 
-            if (text == null)
+            RectTransform rect =
+                slot.GetComponent<RectTransform>();
+
+            if (rect != null)
             {
-                Debug.LogError("CommandSlot missing TMP_Text.");
-                continue;
+                rect.localScale = Vector3.one;
+                rect.localRotation = Quaternion.identity;
             }
 
-            text.raycastTarget = false;
-            text.text = "";
+            LayoutElement layout =
+                slot.GetComponent<LayoutElement>();
 
-            texts.Add(text);
+            if (layout != null)
+                layout.ignoreLayout = false;
+
+            foreach (Graphic graphic
+                in slot.GetComponentsInChildren<Graphic>())
+            {
+                graphic.raycastTarget = false;
+            }
+
+            if (!locked)
+            {
+                TMP_Text text =
+                    slot.GetComponentInChildren<TMP_Text>();
+
+                if (text == null)
+                {
+                    Debug.LogError(
+                        "CommandSlot prefab needs TMP_Text!"
+                    );
+                    continue;
+                }
+
+                text.text = "";
+                texts.Add(text);
+            }
         }
     }
 
@@ -118,23 +168,13 @@ public class ProgrammingTestUI : MonoBehaviour
         UpdateSlots(bigTexts, manager.BigPackage);
         UpdateSlots(smallTexts, manager.SmallPackage);
 
-        Image bigImage = bigPanel != null
-            ? bigPanel.GetComponent<Image>() : null;
+        if (bigPanel != null && bigPanel.image != null)
+            bigPanel.image.color =
+                editingBig ? selectedColor : normalColor;
 
-        Image smallImage = smallPanel != null
-            ? smallPanel.GetComponent<Image>() : null;
-
-        Color selected =
-            new Color(0.15f, 0.55f, 0.4f, 1f);
-
-        Color normal =
-            new Color(0.27f, 0.27f, 0.27f, 1f);
-
-        if (bigImage != null)
-            bigImage.color = editingBig ? selected : normal;
-
-        if (smallImage != null)
-            smallImage.color = editingBig ? normal : selected;
+        if (smallPanel != null && smallPanel.image != null)
+            smallPanel.image.color =
+                editingBig ? normalColor : selectedColor;
     }
 
     private void UpdateSlots(
@@ -149,7 +189,6 @@ public class ProgrammingTestUI : MonoBehaviour
         }
     }
 
-    // Select a package by clicking its panel.
     public void SelectBig()
     {
         editingBig = true;
@@ -164,52 +203,32 @@ public class ProgrammingTestUI : MonoBehaviour
 
     private void AddDirection(GameCommand command)
     {
+        if (manager == null) return;
+
         if (editingBig)
-        {
             manager.AddBigCommand(command);
-        }
         else
-        {
             manager.AddSmallCommand(command);
-        }
     }
 
-    public void AddUp()
-    {
-        AddDirection(GameCommand.Up);
-    }
+    public void AddUp() => AddDirection(GameCommand.Up);
+    public void AddDown() => AddDirection(GameCommand.Down);
+    public void AddLeft() => AddDirection(GameCommand.Left);
+    public void AddRight() => AddDirection(GameCommand.Right);
 
-    public void AddDown()
-    {
-        AddDirection(GameCommand.Down);
-    }
-
-    public void AddLeft()
-    {
-        AddDirection(GameCommand.Left);
-    }
-
-    public void AddRight()
-    {
-        AddDirection(GameCommand.Right);
-    }
-
-    // Call Small always adds an operation to Big.
     public void CallSmall()
     {
-        manager.AddBigCommand(GameCommand.CallSmall);
+        if (manager != null)
+            manager.AddBigCommand(GameCommand.CallSmall);
     }
 
-    // Undo depends on the selected package.
     public void Undo()
     {
+        if (manager == null) return;
+
         if (editingBig)
-        {
             manager.Undo();
-        }
         else
-        {
             manager.UndoSmall();
-        }
     }
 }

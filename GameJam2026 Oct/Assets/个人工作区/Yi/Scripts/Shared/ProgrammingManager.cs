@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class ProgrammingManager : MonoBehaviour
 {
-    [Header("Package Settings")]
-    [SerializeField] private int bigCapacity = 8;
-    [SerializeField] private int smallCapacity = 6;
+    [Header("Big Package Settings")]
+    [Min(1)]
+    [SerializeField] private int bigTotalSlots = 8;
+    [Min(0)]
+    [SerializeField] private int bigUnlockedSlots = 8;
+
+    [Header("Small Package Settings")]
+    [Min(1)]
+    [SerializeField] private int smallTotalSlots = 6;
+    [Min(0)]
+    [SerializeField] private int smallUnlockedSlots = 6;
 
     private readonly List<GameCommand> bigPackage =
         new List<GameCommand>();
@@ -14,25 +22,44 @@ public class ProgrammingManager : MonoBehaviour
     private readonly List<GameCommand> smallPackage =
         new List<GameCommand>();
 
-    // History of executed Big commands.
     private readonly Stack<GameCommand> history =
         new Stack<GameCommand>();
 
     private bool hasWon = false;
-
-    // True after Small has been called at least once.
     private bool smallHasBeenUsed = false;
 
     public IReadOnlyList<GameCommand> BigPackage => bigPackage;
     public IReadOnlyList<GameCommand> SmallPackage => smallPackage;
 
+    public int BigTotalSlots => bigTotalSlots;
+    public int SmallTotalSlots => smallTotalSlots;
+
+    public int BigCapacity =>
+        Mathf.Clamp(bigUnlockedSlots, 0, bigTotalSlots);
+
+    public int SmallCapacity =>
+        Mathf.Clamp(smallUnlockedSlots, 0, smallTotalSlots);
+
     public bool HasWon => hasWon;
     public bool SmallHasBeenUsed => smallHasBeenUsed;
-
     public bool CanUndoBig => history.Count > 0;
 
     public bool CanUndoSmall =>
-        smallPackage.Count > 0 && !smallHasBeenUsed;
+        smallPackage.Count > 0 &&
+        !smallHasBeenUsed &&
+        !hasWon;
+
+    private void OnValidate()
+    {
+        bigTotalSlots = Mathf.Max(1, bigTotalSlots);
+        smallTotalSlots = Mathf.Max(1, smallTotalSlots);
+
+        bigUnlockedSlots =
+            Mathf.Clamp(bigUnlockedSlots, 0, bigTotalSlots);
+
+        smallUnlockedSlots =
+            Mathf.Clamp(smallUnlockedSlots, 0, smallTotalSlots);
+    }
 
     private void OnEnable()
     {
@@ -44,27 +71,12 @@ public class ProgrammingManager : MonoBehaviour
         GameEvents.LevelWon -= HandleWin;
     }
 
-    // Add a command to Small without executing it.
     public void AddSmallCommand(GameCommand command)
     {
-        if (hasWon) return;
+        if (hasWon || smallHasBeenUsed) return;
+        if (command == GameCommand.CallSmall) return;
 
-        if (command == GameCommand.CallSmall)
-        {
-            Debug.LogWarning("Small cannot call itself.");
-            return;
-        }
-
-        // Small is locked after being used.
-        if (smallHasBeenUsed)
-        {
-            Debug.LogWarning(
-                "Small Package has already been used. Editing is locked."
-            );
-            return;
-        }
-
-        if (smallPackage.Count >= smallCapacity)
+        if (smallPackage.Count >= SmallCapacity)
         {
             Debug.LogWarning("Small Package is full.");
             return;
@@ -74,12 +86,11 @@ public class ProgrammingManager : MonoBehaviour
         GameEvents.ProgramsChanged?.Invoke();
     }
 
-    // Add a command to Big and execute immediately.
     public void AddBigCommand(GameCommand command)
     {
         if (hasWon) return;
 
-        if (bigPackage.Count >= bigCapacity)
+        if (bigPackage.Count >= BigCapacity)
         {
             Debug.LogWarning("Big Package is full.");
             return;
@@ -96,10 +107,7 @@ public class ProgrammingManager : MonoBehaviour
                 return;
             }
 
-            // Copy the current Small commands.
             sequence.AddRange(smallPackage);
-
-            // Lock Small after its first use.
             smallHasBeenUsed = true;
         }
         else
@@ -111,70 +119,34 @@ public class ProgrammingManager : MonoBehaviour
         history.Push(command);
 
         GameEvents.ProgramsChanged?.Invoke();
-
-        // A / MockWorld executes the movement sequence.
         GameEvents.MoveSequenceRequested?.Invoke(sequence);
     }
 
-    // Undo the most recent Big command.
-
+    // Big Undo always works, including CallSmall.
     public void Undo()
     {
-        if (history.Count == 0)
-        {
-            Debug.Log("Nothing to undo in Big Package.");
-            return;
-        }
+        if (history.Count == 0) return;
 
-        // Remove the latest Big command,
-        // including CallSmall.
-        GameCommand lastCommand = history.Pop();
-
+        GameCommand last = history.Pop();
         bigPackage.RemoveAt(bigPackage.Count - 1);
 
-        // Restore the world state before this command.
-        // If it was CallSmall, restore the whole sequence.
         GameEvents.UndoRequested?.Invoke();
 
         hasWon = false;
-
-        // Do NOT reset smallHasBeenUsed.
-        // Small stays locked after its first use.
-
         GameEvents.ProgramsChanged?.Invoke();
 
-        Debug.Log("Big Package undone: " + lastCommand);
+        Debug.Log("Big Undo: " + last);
     }
 
-
-    // Undo Small only if it has never been used.
+    // Small editing is locked after first use.
     public void UndoSmall()
     {
-        if (hasWon) return;
-
-        if (smallHasBeenUsed)
-        {
-            Debug.LogWarning(
-                "Small Package has been used and cannot be undone."
-            );
-            return;
-        }
-
-        if (smallPackage.Count == 0)
-        {
-            Debug.Log("Nothing to undo in Small Package.");
-            return;
-        }
+        if (!CanUndoSmall) return;
 
         smallPackage.RemoveAt(smallPackage.Count - 1);
-
         GameEvents.ProgramsChanged?.Invoke();
-
-        Debug.Log("Small Package: Last command removed.");
     }
 
-    // Reset B's stored state.
-    // The world must also be reset separately.
     public void ResetProgramming()
     {
         bigPackage.Clear();
@@ -185,8 +157,6 @@ public class ProgrammingManager : MonoBehaviour
         smallHasBeenUsed = false;
 
         GameEvents.ProgramsChanged?.Invoke();
-
-        Debug.Log("Programming reset.");
     }
 
     private void HandleWin()
