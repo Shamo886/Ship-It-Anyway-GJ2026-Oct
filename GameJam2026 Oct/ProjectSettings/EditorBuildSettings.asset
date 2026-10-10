@@ -8,5 +8,11 @@ EditorBuildSettings:
   - enabled: 1
     path: "Assets/Scenes/\u4E3B\u9875.unity"
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: "Assets/\u4E2A\u4EBA\u5DE5\u4F5C\u533A/Tessa/TessaStartScene.unity"
+    guid: 7aa38fff0783f864b8d94f70e376fe2c
+  - enabled: 1
+    path: "Assets/\u4E2A\u4EBA\u5DE5\u4F5C\u533A/Yi/YiScene.unity"
+    guid: 1c50659fd2e4c534d92e3bcbed213a60
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
