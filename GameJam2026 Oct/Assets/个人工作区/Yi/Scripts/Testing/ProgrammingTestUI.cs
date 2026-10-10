@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,9 +12,17 @@ public class ProgrammingTestUI : MonoBehaviour
     [SerializeField] private Button bigPanel;
     [SerializeField] private Button smallPanel;
 
-    [Header("Prefabs")]
+    [Header("Slot Prefabs")]
     [SerializeField] private GameObject commandSlotPrefab;
     [SerializeField] private GameObject lockedSlotPrefab;
+
+    [Header("Command Sprites")]
+    [SerializeField] private Sprite emptySlotSprite;
+    [SerializeField] private Sprite upSprite;
+    [SerializeField] private Sprite downSprite;
+    [SerializeField] private Sprite leftSprite;
+    [SerializeField] private Sprite rightSprite;
+    [SerializeField] private Sprite callSmallSprite;
 
     [Header("Test Selection Colors")]
     [SerializeField]
@@ -26,11 +33,11 @@ public class ProgrammingTestUI : MonoBehaviour
     private Color normalColor =
         new Color(0.27f, 0.27f, 0.27f, 1f);
 
-    private readonly List<TMP_Text> bigTexts =
-        new List<TMP_Text>();
+    private readonly List<Image> bigImages =
+        new List<Image>();
 
-    private readonly List<TMP_Text> smallTexts =
-        new List<TMP_Text>();
+    private readonly List<Image> smallImages =
+        new List<Image>();
 
     private bool editingBig = true;
 
@@ -61,14 +68,14 @@ public class ProgrammingTestUI : MonoBehaviour
             bigPanel.transform,
             manager.BigTotalSlots,
             manager.BigCapacity,
-            bigTexts
+            bigImages
         );
 
         CreateSlots(
             smallPanel.transform,
             manager.SmallTotalSlots,
             manager.SmallCapacity,
-            smallTexts
+            smallImages
         );
 
         bigPanel.onClick.AddListener(SelectBig);
@@ -90,19 +97,19 @@ public class ProgrammingTestUI : MonoBehaviour
         Transform parent,
         int total,
         int unlocked,
-        List<TMP_Text> texts)
+        List<Image> images)
     {
-        texts.Clear();
+        images.Clear();
 
         for (int i = 0; i < total; i++)
         {
             bool locked = i >= unlocked;
 
-            GameObject prefab =
-                locked ? lockedSlotPrefab : commandSlotPrefab;
+            GameObject prefab = locked
+                ? lockedSlotPrefab
+                : commandSlotPrefab;
 
-            GameObject slot =
-                Instantiate(prefab, parent, false);
+            GameObject slot = Instantiate(prefab, parent, false);
 
             slot.name = locked
                 ? "LockedSlot_" + (i + 1)
@@ -123,69 +130,93 @@ public class ProgrammingTestUI : MonoBehaviour
             if (layout != null)
                 layout.ignoreLayout = false;
 
-            foreach (Graphic graphic
-                in slot.GetComponentsInChildren<Graphic>())
+            // Allow clicks to pass through to Panel.
+            foreach (Graphic graphic in
+                slot.GetComponentsInChildren<Graphic>())
             {
                 graphic.raycastTarget = false;
             }
 
-            if (!locked)
+            // Locked slots keep their own prefab appearance.
+            if (locked)
+                continue;
+
+            Image image = slot.GetComponent<Image>();
+
+            if (image == null)
             {
-                TMP_Text text =
-                    slot.GetComponentInChildren<TMP_Text>();
-
-                if (text == null)
-                {
-                    Debug.LogError(
-                        "CommandSlot prefab needs TMP_Text!"
-                    );
-                    continue;
-                }
-
-                text.text = "";
-                texts.Add(text);
+                Debug.LogError(
+                    "CommandSlot prefab needs an Image component!"
+                );
+                continue;
             }
+
+            image.color = Color.white;
+            image.sprite = emptySlotSprite;
+
+            images.Add(image);
         }
     }
 
-    private string GetSymbol(GameCommand command)
+    // Choose the correct image for each command.
+    private Sprite GetCommandSprite(GameCommand command)
     {
         switch (command)
         {
-            case GameCommand.Up: return "↑";
-            case GameCommand.Down: return "↓";
-            case GameCommand.Left: return "←";
-            case GameCommand.Right: return "→";
-            case GameCommand.CallSmall: return "S";
-            default: return "?";
+            case GameCommand.Up:
+                return upSprite;
+
+            case GameCommand.Down:
+                return downSprite;
+
+            case GameCommand.Left:
+                return leftSprite;
+
+            case GameCommand.Right:
+                return rightSprite;
+
+            case GameCommand.CallSmall:
+                return callSmallSprite;
+
+            default:
+                return emptySlotSprite;
         }
     }
 
     public void RefreshUI()
     {
-        if (manager == null) return;
+        if (manager == null)
+            return;
 
-        UpdateSlots(bigTexts, manager.BigPackage);
-        UpdateSlots(smallTexts, manager.SmallPackage);
+        UpdateSlots(bigImages, manager.BigPackage);
+        UpdateSlots(smallImages, manager.SmallPackage);
 
         if (bigPanel != null && bigPanel.image != null)
+        {
             bigPanel.image.color =
                 editingBig ? selectedColor : normalColor;
+        }
 
         if (smallPanel != null && smallPanel.image != null)
+        {
             smallPanel.image.color =
                 editingBig ? normalColor : selectedColor;
+        }
     }
 
+    // Update the Image component instead of TMP text.
     private void UpdateSlots(
-        List<TMP_Text> texts,
+        List<Image> images,
         IReadOnlyList<GameCommand> commands)
     {
-        for (int i = 0; i < texts.Count; i++)
+        for (int i = 0; i < images.Count; i++)
         {
-            texts[i].text = i < commands.Count
-                ? GetSymbol(commands[i])
-                : "";
+            Sprite sprite = i < commands.Count
+                ? GetCommandSprite(commands[i])
+                : emptySlotSprite;
+
+            images[i].sprite = sprite;
+            images[i].color = Color.white;
         }
     }
 
@@ -203,18 +234,38 @@ public class ProgrammingTestUI : MonoBehaviour
 
     private void AddDirection(GameCommand command)
     {
-        if (manager == null) return;
+        if (manager == null)
+            return;
 
         if (editingBig)
+        {
             manager.AddBigCommand(command);
+        }
         else
+        {
             manager.AddSmallCommand(command);
+        }
     }
 
-    public void AddUp() => AddDirection(GameCommand.Up);
-    public void AddDown() => AddDirection(GameCommand.Down);
-    public void AddLeft() => AddDirection(GameCommand.Left);
-    public void AddRight() => AddDirection(GameCommand.Right);
+    public void AddUp()
+    {
+        AddDirection(GameCommand.Up);
+    }
+
+    public void AddDown()
+    {
+        AddDirection(GameCommand.Down);
+    }
+
+    public void AddLeft()
+    {
+        AddDirection(GameCommand.Left);
+    }
+
+    public void AddRight()
+    {
+        AddDirection(GameCommand.Right);
+    }
 
     public void CallSmall()
     {
@@ -224,7 +275,8 @@ public class ProgrammingTestUI : MonoBehaviour
 
     public void Undo()
     {
-        if (manager == null) return;
+        if (manager == null)
+            return;
 
         if (editingBig)
             manager.Undo();
