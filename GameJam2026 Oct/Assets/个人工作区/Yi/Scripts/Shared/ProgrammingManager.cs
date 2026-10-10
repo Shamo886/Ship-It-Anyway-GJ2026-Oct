@@ -8,25 +8,31 @@ public class ProgrammingManager : MonoBehaviour
     [SerializeField] private int bigCapacity = 8;
     [SerializeField] private int smallCapacity = 6;
 
-    // Commands currently stored in the two packages.
     private readonly List<GameCommand> bigPackage =
         new List<GameCommand>();
 
     private readonly List<GameCommand> smallPackage =
         new List<GameCommand>();
 
-    // One record for each command added to Big.
+    // History of executed Big commands.
     private readonly Stack<GameCommand> history =
         new Stack<GameCommand>();
 
     private bool hasWon = false;
 
-    // Other scripts can read these lists, but not modify them.
+    // True after Small has been called at least once.
+    private bool smallHasBeenUsed = false;
+
     public IReadOnlyList<GameCommand> BigPackage => bigPackage;
     public IReadOnlyList<GameCommand> SmallPackage => smallPackage;
 
     public bool HasWon => hasWon;
-    public bool CanUndo => history.Count > 0;
+    public bool SmallHasBeenUsed => smallHasBeenUsed;
+
+    public bool CanUndoBig => history.Count > 0;
+
+    public bool CanUndoSmall =>
+        smallPackage.Count > 0 && !smallHasBeenUsed;
 
     private void OnEnable()
     {
@@ -38,8 +44,7 @@ public class ProgrammingManager : MonoBehaviour
         GameEvents.LevelWon -= HandleWin;
     }
 
-    // Add a command to the small package.
-    // This does NOT move the player.
+    // Add a command to Small without executing it.
     public void AddSmallCommand(GameCommand command)
     {
         if (hasWon) return;
@@ -47,6 +52,15 @@ public class ProgrammingManager : MonoBehaviour
         if (command == GameCommand.CallSmall)
         {
             Debug.LogWarning("Small cannot call itself.");
+            return;
+        }
+
+        // Small is locked after being used.
+        if (smallHasBeenUsed)
+        {
+            Debug.LogWarning(
+                "Small Package has already been used. Editing is locked."
+            );
             return;
         }
 
@@ -60,8 +74,7 @@ public class ProgrammingManager : MonoBehaviour
         GameEvents.ProgramsChanged?.Invoke();
     }
 
-    // Add a command to the big package.
-    // This immediately requests execution.
+    // Add a command to Big and execute immediately.
     public void AddBigCommand(GameCommand command)
     {
         if (hasWon) return;
@@ -72,66 +85,108 @@ public class ProgrammingManager : MonoBehaviour
             return;
         }
 
-        if (command == GameCommand.CallSmall &&
-            smallPackage.Count == 0)
-        {
-            Debug.LogWarning("Small Package is empty.");
-            return;
-        }
-
         List<GameCommand> sequence =
             new List<GameCommand>();
 
         if (command == GameCommand.CallSmall)
         {
-            // Expand Small into movement commands.
+            if (smallPackage.Count == 0)
+            {
+                Debug.LogWarning("Small Package is empty.");
+                return;
+            }
+
+            // Copy the current Small commands.
             sequence.AddRange(smallPackage);
+
+            // Lock Small after its first use.
+            smallHasBeenUsed = true;
         }
         else
         {
             sequence.Add(command);
         }
 
-        // Save the Big command before execution.
         bigPackage.Add(command);
         history.Push(command);
 
         GameEvents.ProgramsChanged?.Invoke();
 
-        // A handles movement, collisions and tile changes.
+        // A / MockWorld executes the movement sequence.
         GameEvents.MoveSequenceRequested?.Invoke(sequence);
     }
 
-    // Undo the most recent Big Package command.
+    // Undo the most recent Big command.
+
     public void Undo()
     {
         if (history.Count == 0)
         {
-            Debug.Log("Nothing to undo.");
+            Debug.Log("Nothing to undo in Big Package.");
             return;
         }
 
-        history.Pop();
+        // Remove the latest Big command,
+        // including CallSmall.
+        GameCommand lastCommand = history.Pop();
+
         bigPackage.RemoveAt(bigPackage.Count - 1);
 
-        // A restores its previous world snapshot.
+        // Restore the world state before this command.
+        // If it was CallSmall, restore the whole sequence.
         GameEvents.UndoRequested?.Invoke();
 
-        // Undo may also be used after reaching the goal.
         hasWon = false;
 
+        // Do NOT reset smallHasBeenUsed.
+        // Small stays locked after its first use.
+
         GameEvents.ProgramsChanged?.Invoke();
+
+        Debug.Log("Big Package undone: " + lastCommand);
     }
 
-    // Reset B's stored program state.
+
+    // Undo Small only if it has never been used.
+    public void UndoSmall()
+    {
+        if (hasWon) return;
+
+        if (smallHasBeenUsed)
+        {
+            Debug.LogWarning(
+                "Small Package has been used and cannot be undone."
+            );
+            return;
+        }
+
+        if (smallPackage.Count == 0)
+        {
+            Debug.Log("Nothing to undo in Small Package.");
+            return;
+        }
+
+        smallPackage.RemoveAt(smallPackage.Count - 1);
+
+        GameEvents.ProgramsChanged?.Invoke();
+
+        Debug.Log("Small Package: Last command removed.");
+    }
+
+    // Reset B's stored state.
+    // The world must also be reset separately.
     public void ResetProgramming()
     {
         bigPackage.Clear();
         smallPackage.Clear();
         history.Clear();
+
         hasWon = false;
+        smallHasBeenUsed = false;
 
         GameEvents.ProgramsChanged?.Invoke();
+
+        Debug.Log("Programming reset.");
     }
 
     private void HandleWin()

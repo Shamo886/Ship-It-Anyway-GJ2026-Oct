@@ -78,6 +78,7 @@ public class ProgrammingTestUI : MonoBehaviour
             slot.name = "Slot_" + (i + 1);
 
             Image image = slot.GetComponent<Image>();
+
             if (image != null)
                 image.raycastTarget = false;
 
@@ -92,6 +93,7 @@ public class ProgrammingTestUI : MonoBehaviour
 
             text.raycastTarget = false;
             text.text = "";
+
             texts.Add(text);
         }
     }
@@ -122,8 +124,11 @@ public class ProgrammingTestUI : MonoBehaviour
         Image smallImage = smallPanel != null
             ? smallPanel.GetComponent<Image>() : null;
 
-        Color selected = new Color(0.15f, 0.55f, 0.4f, 1f);
-        Color normal = new Color(0.27f, 0.27f, 0.27f, 1f);
+        Color selected =
+            new Color(0.15f, 0.55f, 0.4f, 1f);
+
+        Color normal =
+            new Color(0.27f, 0.27f, 0.27f, 1f);
 
         if (bigImage != null)
             bigImage.color = editingBig ? selected : normal;
@@ -144,6 +149,7 @@ public class ProgrammingTestUI : MonoBehaviour
         }
     }
 
+    // Select a package by clicking its panel.
     public void SelectBig()
     {
         editingBig = true;
@@ -159,23 +165,51 @@ public class ProgrammingTestUI : MonoBehaviour
     private void AddDirection(GameCommand command)
     {
         if (editingBig)
+        {
             manager.AddBigCommand(command);
+        }
         else
+        {
             manager.AddSmallCommand(command);
+        }
     }
 
-    public void AddUp() => AddDirection(GameCommand.Up);
-    public void AddDown() => AddDirection(GameCommand.Down);
-    public void AddLeft() => AddDirection(GameCommand.Left);
-    public void AddRight() => AddDirection(GameCommand.Right);
+    public void AddUp()
+    {
+        AddDirection(GameCommand.Up);
+    }
 
+    public void AddDown()
+    {
+        AddDirection(GameCommand.Down);
+    }
+
+    public void AddLeft()
+    {
+        AddDirection(GameCommand.Left);
+    }
+
+    public void AddRight()
+    {
+        AddDirection(GameCommand.Right);
+    }
+
+    // Call Small always adds an operation to Big.
     public void CallSmall()
     {
         manager.AddBigCommand(GameCommand.CallSmall);
     }
 
+    // Undo depends on the selected package.
     public void Undo()
     {
-        manager.Undo();
+        if (editingBig)
+        {
+            manager.Undo();
+        }
+        else
+        {
+            manager.UndoSmall();
+        }
     }
 }
