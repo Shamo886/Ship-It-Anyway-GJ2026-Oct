@@ -15,6 +15,10 @@ T#..T##
     [Header("Optional full-board artwork")]
     public Sprite boardSprite;
 
+    [Header("Road patterns (alternating by grid cell)")]
+    public Sprite roadSpriteA;
+    public Sprite roadSpriteB;
+
     [Min(0.01f)]
     public float cellSize = 1f;
 }

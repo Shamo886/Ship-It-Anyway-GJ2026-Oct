@@ -4,6 +4,12 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class ToggleTile : MonoBehaviour
 {
+    [Header("Special tile sprites")]
+    [SerializeField] private Sprite openEyeSprite;   // UP: blocks movement
+    [SerializeField] private Sprite closedEyeSprite; // DOWN: walkable
+    [SerializeField] private bool useLiftAnimation = false;
+
+    [Header("Fallback colors (if sprites not assigned)")]
     [SerializeField] private Color upColor = new Color(0.95f, 0.40f, 0.33f);
     [SerializeField] private Color downColor = new Color(0.34f, 0.72f, 0.82f);
     [SerializeField] private float animationDuration = 0.16f;
@@ -18,7 +24,7 @@ public class ToggleTile : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         sprite.sortingOrder = 3;
         baseLocalPosition = transform.localPosition;
-        liftHeight = 0.15f * cellSize;
+        liftHeight = useLiftAnimation ? 0.15f * cellSize : 0f;
         SetRaised(initiallyRaised, false);
     }
 
@@ -30,7 +36,14 @@ public class ToggleTile : MonoBehaviour
 
         Vector3 destination = baseLocalPosition +
             (raised ? Vector3.up * liftHeight : Vector3.zero);
-        Color color = raised ? upColor : downColor;
+        Sprite stateImage = raised ? openEyeSprite : closedEyeSprite;
+        if (stateImage != null)
+            sprite.sprite = stateImage;
+
+        // Art sprites keep their original colors; test squares use fallback tints.
+        Color color = stateImage != null
+            ? Color.white
+            : (raised ? upColor : downColor);
 
         if (!animate || animationDuration <= 0f)
         {

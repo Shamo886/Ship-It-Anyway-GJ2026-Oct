@@ -920,7 +920,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 365286354}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 320df83af0c5b724db81c9c366980534, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f303d41e771d9241b31bc26c5df30b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   gridOrigin: {fileID: 146269415}
@@ -2157,6 +2157,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1239158632}
   m_CullTransparentMesh: 1
+--- !u!1 &1301475729
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1301475731}
+  - component: {fileID: 1301475730}
+  m_Layer: 0
+  m_Name: LevelAdvanceController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1301475730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1301475729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9879a0b764b07d341a30a9a4bc98c7f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelAdvanceController
+  programmingManager: {fileID: 1043266258}
+  levelCount: 2
+--- !u!4 &1301475731
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1301475729}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.68459, y: 1.35185, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1346954514
 GameObject:
   m_ObjectHideFlags: 0
@@ -3343,3 +3389,4 @@ SceneRoots:
   - {fileID: 1043266259}
   - {fileID: 36482149}
   - {fileID: 413195584}
+  - {fileID: 1301475731}

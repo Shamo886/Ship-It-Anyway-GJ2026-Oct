@@ -69,10 +69,31 @@ public class GridManager : MonoBehaviour
                 if (sr != null)
                 {
                     sr.sortingOrder = 1;
-                    sr.color = type == 'S' ? new Color(0.45f, 0.85f, 0.55f) :
-                               type == 'G' ? new Color(1f, 0.78f, 0.30f) :
-                               type == 'W' ? new Color(0.3f, 0.3f, 0.35f) :
-                               new Color(0.78f, 0.80f, 0.86f);
+
+                    // Adjacent cells (including special-tile floors) alternate A / B.
+                    // This changes artwork only. Collision is handled elsewhere.
+                    bool useRoadArt = type == '.' || type == 'T' || type == 't';
+                    Sprite roadArt = ((x + y) % 2 == 0)
+                        ? level.roadSpriteA : level.roadSpriteB;
+
+                    // If one image is missing, use the other instead of leaving a gap.
+                    if (roadArt == null)
+                        roadArt = level.roadSpriteA != null
+                            ? level.roadSpriteA : level.roadSpriteB;
+
+                    if (useRoadArt && roadArt != null)
+                    {
+                        sr.sprite = roadArt;
+                        sr.color = Color.white; // no gray/red tint on imported art
+                    }
+                    else
+                    {
+                        // Preserve original test colors for start, goal, and walls.
+                        sr.color = type == 'S' ? new Color(0.45f, 0.85f, 0.55f) :
+                                   type == 'G' ? new Color(1f, 0.78f, 0.30f) :
+                                   type == 'W' ? new Color(0.3f, 0.3f, 0.35f) :
+                                   new Color(0.78f, 0.80f, 0.86f);
+                    }
                 }
             }
 
