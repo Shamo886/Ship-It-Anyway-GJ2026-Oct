@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StartMenuManager : MonoBehaviour
 {
@@ -7,6 +8,9 @@ public class StartMenuManager : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject creditsPanel;
+
+    [Header("Game Scene")]
+    [SerializeField] private string gameSceneName;
 
     private void Start()
     {
@@ -40,10 +44,25 @@ public class StartMenuManager : MonoBehaviour
             creditsPanel.SetActive(true);
     }
 
+    public void PlayGame()
+    {
+        if (string.IsNullOrWhiteSpace(gameSceneName))
+        {
+            Debug.LogWarning("Game Scene Name is not assigned!");
+            return;
+        }
+
+        SceneManager.LoadScene(gameSceneName);
+    }
+
     public void QuitGame()
     {
         Debug.Log("Quit Game");
 
         Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }
