@@ -157,10 +157,19 @@ public class WorldController : MonoBehaviour
             step.stepIndex = i;
             gridManager.SyncSpecialTiles(simulator.RaisedStates, true);
 
+          
             if (step.moved)
-                yield return playerMover.AnimateMove(gridManager.GridToWorld(step.to));
+            {
+                yield return playerMover.AnimateMove(
+                    gridManager.GridToWorld(step.to));
+            }
             else
+            {
+                GameSFX.Instance?.PlayHit();
+
                 yield return new WaitForSeconds(blockedStepDelay);
+            }
+
 
             processed++;
             WorldBus.ReportStep(step);

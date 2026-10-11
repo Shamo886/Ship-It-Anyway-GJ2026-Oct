@@ -308,10 +308,13 @@ public class ProgrammingTestUI : MonoBehaviour
         RefreshUI();
     }
 
+
     private void AddDirection(GameCommand command)
     {
         if (manager == null)
             return;
+
+   
 
         if (editingBig)
         {
@@ -322,6 +325,7 @@ public class ProgrammingTestUI : MonoBehaviour
             manager.AddSmallCommand(command);
         }
     }
+
 
     public void AddUp()
     {
