@@ -1751,7 +1751,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ff93c8481b722864ea4a7b97a132aab8, type: 2}
   - {fileID: 11400000, guid: b0ebed52209a5cc4988b6683b9239dea, type: 2}
   - {fileID: 11400000, guid: 08c411d6e39493440a3ca52f8db935b8, type: 2}
-  initialLevelIndex: 5
+  initialLevelIndex: 0
   blockedStepDelay: 0.22
   showTestButtons: 0
 --- !u!1 &974142027
