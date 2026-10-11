@@ -1636,52 +1636,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 275917772}
   m_CullTransparentMesh: 1
---- !u!1 &280756090
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 280756092}
-  - component: {fileID: 280756091}
-  m_Layer: 0
-  m_Name: CustomCursor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &280756091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 280756090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ed0ef3defd55b44c91c33b8355beb3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CustomGameCursor
-  cursorImage: {fileID: 2800000, guid: c3c44ea90ecc993498d494475178b95c, type: 3}
-  hotSpot: {x: 0, y: 0}
---- !u!4 &280756092
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 280756090}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 180.99438, y: 143.74469, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &282678121
 GameObject:
   m_ObjectHideFlags: 0
@@ -2762,7 +2716,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.3098755, y: 0.0079956055}
+  m_AnchoredPosition: {x: 0.30981445, y: 0.00793457}
   m_SizeDelta: {x: 30.872559, y: 31.358398}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &664634784
@@ -6123,7 +6077,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -4.685913, y: 2.7149658}
+  m_AnchoredPosition: {x: -4.686035, y: 2.7149658}
   m_SizeDelta: {x: 498.058, y: 260.638}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1210643037
@@ -8811,7 +8765,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000061035156, y: -2.045166}
+  m_AnchoredPosition: {x: 0, y: -2.045105}
   m_SizeDelta: {x: -472.8435, y: -266.16864}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1970788048
@@ -9404,4 +9358,3 @@ SceneRoots:
   - {fileID: 52424467}
   - {fileID: 803702040}
   - {fileID: 750986080}
-  - {fileID: 280756092}
