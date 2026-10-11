@@ -277,6 +277,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonHoverImage
   hoverImage: {fileID: 668900102}
+--- !u!1 &79806779
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 79806781}
+  - component: {fileID: 79806780}
+  m_Layer: 0
+  m_Name: VintageFilmEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &79806780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79806779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943aa3a862e7f264bb83a45a278ca972, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VintageFilmEffect
+  targetCanvas: {fileID: 0}
+  vignetteStrength: 0.12
+  vignetteSize: 0.85
+  grainStrength: 0.005
+  grainFPS: 10
+  grainTextureSize: 512
+--- !u!4 &79806781
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 79806779}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 211.80463, y: 155.1676, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &91297313
 GameObject:
   m_ObjectHideFlags: 0
@@ -3894,7 +3944,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 129.83907, y: -10.244601}
+  m_AnchoredPosition: {x: 194.41904, y: -18.28999}
   m_SizeDelta: {x: 691.463, y: 75.842}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1405968053
@@ -4631,7 +4681,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 130.42, y: 126.045425}
+  m_AnchoredPosition: {x: 195, y: 118}
   m_SizeDelta: {x: 692.62, y: 75.842}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1622196849
@@ -4856,7 +4906,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 128.10307, y: -140.32063}
+  m_AnchoredPosition: {x: 192.68304, y: -148.36603}
   m_SizeDelta: {x: 691.463, y: 75.842}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1758605811
@@ -6051,3 +6101,4 @@ SceneRoots:
   - {fileID: 952123483}
   - {fileID: 1846381475}
   - {fileID: 747744250}
+  - {fileID: 79806781}

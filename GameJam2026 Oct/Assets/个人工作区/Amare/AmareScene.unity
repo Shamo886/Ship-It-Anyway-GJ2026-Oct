@@ -2160,6 +2160,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 687609019}
   m_CullTransparentMesh: 1
+--- !u!1 &750986079
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 750986080}
+  - component: {fileID: 750986081}
+  m_Layer: 0
+  m_Name: VintageFilmEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &750986080
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 750986079}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 211.80463, y: 155.1676, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &750986081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 750986079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943aa3a862e7f264bb83a45a278ca972, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VintageFilmEffect
+  targetCanvas: {fileID: 1346954518}
+  vignetteStrength: 0.12
+  vignetteSize: 0.85
+  grainStrength: 0.015
+  grainFPS: 10
+  grainTextureSize: 512
 --- !u!1 &780971834
 GameObject:
   m_ObjectHideFlags: 0
@@ -2260,7 +2310,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5af7e6d9354fb8e42ad4268a341cbc95, type: 3}
   - {fileID: 21300000, guid: 19306df687cccdd409db139fc4b8cb3f, type: 3}
   - {fileID: 21300000, guid: c30481a1e8efdf74a8b271cb11ad5882, type: 3}
-  hintDelaySeconds: 5
+  hintDelaySeconds: 30
 --- !u!4 &803702040
 Transform:
   m_ObjectHideFlags: 0
@@ -3247,7 +3297,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ff93c8481b722864ea4a7b97a132aab8, type: 2}
   - {fileID: 11400000, guid: b0ebed52209a5cc4988b6683b9239dea, type: 2}
   - {fileID: 11400000, guid: 08c411d6e39493440a3ca52f8db935b8, type: 2}
-  initialLevelIndex: 5
+  initialLevelIndex: 0
   blockedStepDelay: 0.22
   showTestButtons: 0
 --- !u!1 &974142027
@@ -3635,7 +3685,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 105, y: 90}
-  m_Spacing: {x: 15, y: 10}
+  m_Spacing: {x: 20, y: 15}
   m_Constraint: 1
   m_ConstraintCount: 2
 --- !u!114 &1005527929
@@ -3658,7 +3708,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 58c59cc4d0c95074f80145953f40f69a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d178730cc3b5962429bb94948a04a55e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6900,3 +6950,4 @@ SceneRoots:
   - {fileID: 1835821089}
   - {fileID: 52424467}
   - {fileID: 803702040}
+  - {fileID: 750986080}
