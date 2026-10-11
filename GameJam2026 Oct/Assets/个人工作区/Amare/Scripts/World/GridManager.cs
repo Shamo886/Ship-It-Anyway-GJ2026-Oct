@@ -27,6 +27,9 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Transform specialTilesRoot;
     [SerializeField] private GameObject specialTilePrefab;
 
+    [Header("Goal Tile Art")]
+    [SerializeField] private Sprite goalTileSprite;
+
     private string[] rows;
     private LevelData currentLevel;
     private readonly Dictionary<Vector2Int, ToggleTile> tileViews =
@@ -102,8 +105,16 @@ public class GridManager : MonoBehaviour
                             ? level.roadSpriteA : level.roadSpriteB;
 
                         // Start Tile
-                        if (type == 'S' && startTileSprite != null)
+
+                        if (type == 'G' && goalTileSprite != null)
                         {
+                            // Goal tile art
+                            sr.sprite = goalTileSprite;
+                            sr.color = Color.white;
+                        }
+                        else if (type == 'S' && startTileSprite != null)
+                        {
+                            // Keep your original Start tile code here
                             sr.sprite = startTileSprite;
                             sr.color = Color.white;
 
@@ -121,6 +132,7 @@ public class GridManager : MonoBehaviour
                                     new Vector3(scale, scale, 1f);
                             }
                         }
+                        
                         // Normal Road
                         else if (useRoadArt && roadArt != null)
                         {
