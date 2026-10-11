@@ -1,43 +1,52 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Shows a crow hint after the player has spent the specified amount of time
-/// in a level without winning.
-///
-/// IMPORTANT: Keep the original crow Button's Image, Sprite Swap and OnClick
-/// unchanged. This controller displays a separate, non-interactive overlay
-/// with the open-mouth sprite, so it cannot disrupt the Button's pressed state.
+/// Opening crow dialogue (1-2 pictures per level) + timed hints.
+/// Keeps the existing clickable crow Button, its Sprite Swap and its audio OnClick.
+/// WorldBus.LevelLoaded is Action<int> in this project.
 /// </summary>
 public class CrowHintController : MonoBehaviour
 {
+    [Serializable]
+    public class LevelDialogue
+    {
+        public Sprite[] pictures;
+    }
+
     [Header("Existing Crow Button")]
     [SerializeField] private Button crowButton;
 
-    [Header("Images (must NOT be the Button's original Image)")]
+    [Header("Crow and Hint Images")]
     [SerializeField] private Image autoOpenCrowOverlay;
     [SerializeField] private Image hintImage;
-
-    [Header("Open Crow Sprite (optional if Button has Pressed Sprite)")]
     [SerializeField] private Sprite openCrowSprite;
 
-    [Header("Hint Sprite Per Level (Element 0 = Level 0)")]
+    [Header("Opening Dialogue UI")]
+    [SerializeField] private Image dialogueImage;
+    [SerializeField] private Button dialogueClickArea;
+
+    [Header("Opening Dialogues (Element 0 = Level 0)")]
+    [SerializeField] private LevelDialogue[] levelDialogues;
+
+    [Header("30-Second Hint Images (Element 0 = Level 0)")]
     [SerializeField] private Sprite[] levelHintSprites;
 
-    [Header("Timing")]
+    [Header("Hint Timing (starts AFTER dialogue ends)")]
     [Min(0f)]
     [SerializeField] private float hintDelaySeconds = 30f;
 
-    // The Image on the ORIGINAL clickable crow Button.
-    // Hide only its pixels during the automatic hint; do not disable the GameObject/Image.
     private Image originalCrowImage;
     private float originalCrowAlpha = 1f;
 
     private int currentLevelIndex = -1;
+    private int dialogueIndex;
     private float elapsedSeconds;
+    private bool dialogueActive;
     private bool timerRunning;
-    private bool hasWon;
     private bool hintShown;
+    private bool hasWon;
 
     private void Awake()
     {
@@ -45,15 +54,14 @@ public class CrowHintController : MonoBehaviour
         {
             originalCrowImage = crowButton.GetComponent<Image>();
             if (originalCrowImage != null)
+            {
                 originalCrowAlpha = originalCrowImage.color.a;
+                originalCrowImage.raycastTarget = true; // Keep the old Button clickable.
+            }
+
+            if (openCrowSprite == null)
+                openCrowSprite = crowButton.spriteState.pressedSprite;
         }
-
-        if (originalCrowImage != null && originalCrowImage == autoOpenCrowOverlay)
-            Debug.LogError("CrowHint: The overlay must be a separate child Image, not the Button's own Image.");
-
-        // Reuse B's existing Pressed Sprite if a separate sprite isn't assigned.
-        if (openCrowSprite == null && crowButton != null)
-            openCrowSprite = crowButton.spriteState.pressedSprite;
 
         if (autoOpenCrowOverlay != null)
         {
@@ -61,105 +69,188 @@ public class CrowHintController : MonoBehaviour
             if (openCrowSprite != null)
                 autoOpenCrowOverlay.sprite = openCrowSprite;
         }
-
         if (hintImage != null)
             hintImage.raycastTarget = false;
+        if (dialogueImage != null)
+            dialogueImage.raycastTarget = false;
+        if (dialogueClickArea != null && dialogueClickArea.image != null)
+            dialogueClickArea.image.raycastTarget = true;
 
-        HideHintVisuals();
+        if (autoOpenCrowOverlay != null && autoOpenCrowOverlay == originalCrowImage)
+            Debug.LogError("CrowHint: AutoOpenCrowOverlay must not be the original crow Image.");
+        if (dialogueClickArea != null && dialogueClickArea.gameObject == crowButton.gameObject)
+            Debug.LogError("CrowHint: DialogueClickArea must be a separate full-screen Button.");
+
+        HideAllVisuals();
     }
 
     private void OnEnable()
     {
         WorldBus.LevelLoaded += OnLevelLoaded;
         WorldBus.WorldChanged += OnWorldChanged;
+
+        if (dialogueClickArea != null)
+            dialogueClickArea.onClick.AddListener(NextDialogue);
     }
 
     private void OnDisable()
     {
-        // Also restore the original crow if the hint controller is disabled.
-        HideHintVisuals();
         WorldBus.LevelLoaded -= OnLevelLoaded;
         WorldBus.WorldChanged -= OnWorldChanged;
+
+        if (dialogueClickArea != null)
+            dialogueClickArea.onClick.RemoveListener(NextDialogue);
+
+        bool wasInDialogue = dialogueActive;
+        dialogueActive = false;
+        timerRunning = false;
+        HideAllVisuals();
+        if (wasInDialogue)
+            WorldBus.SendPause(false);
     }
 
     private void Update()
     {
-        if (!timerRunning || hasWon || hintShown)
+        if (!timerRunning || hasWon || hintShown || dialogueActive)
             return;
 
-        // A pause using Time.timeScale = 0 also pauses this timer.
         elapsedSeconds += Time.deltaTime;
         if (elapsedSeconds >= hintDelaySeconds)
-            ShowHint();
+            ShowTimedHint();
     }
 
     private void OnLevelLoaded(int levelIndex)
     {
         currentLevelIndex = levelIndex;
+        dialogueIndex = 0;
         elapsedSeconds = 0f;
-        timerRunning = true;
+        dialogueActive = false;
+        timerRunning = false;
         hasWon = false;
         hintShown = false;
-        HideHintVisuals();
+        HideAllVisuals();
+
+        Sprite[] pictures = GetDialoguePictures(levelIndex);
+        if (pictures != null && pictures.Length > 0)
+        {
+            dialogueActive = true;
+            ShowDialogueFrame();
+            WorldBus.SendPause(true); // Block game commands while reading.
+        }
+        else
+        {
+            timerRunning = true; // Empty dialogue array: start the 30-second timer.
+        }
+    }
+
+    private Sprite[] GetDialoguePictures(int levelIndex)
+    {
+        if (levelDialogues == null || levelIndex < 0 || levelIndex >= levelDialogues.Length)
+            return null;
+        LevelDialogue level = levelDialogues[levelIndex];
+        return level == null ? null : level.pictures;
+    }
+
+    private void ShowDialogueFrame()
+    {
+        Sprite[] pictures = GetDialoguePictures(currentLevelIndex);
+        if (pictures == null || dialogueIndex >= pictures.Length)
+        {
+            FinishDialogue();
+            return;
+        }
+
+        ShowOpenCrow();
+
+        if (dialogueImage != null)
+        {
+            dialogueImage.sprite = pictures[dialogueIndex];
+            dialogueImage.preserveAspect = true;
+            dialogueImage.gameObject.SetActive(pictures[dialogueIndex] != null);
+        }
+
+        if (dialogueClickArea != null)
+        {
+            dialogueClickArea.gameObject.SetActive(true);
+            // The transparent full-screen Button goes above all other UI,
+            // preventing a dialogue click from also pressing game buttons.
+            dialogueClickArea.transform.SetAsLastSibling();
+        }
+        else
+        {
+            Debug.LogWarning("CrowHint: DialogueClickArea is not assigned.");
+        }
+    }
+
+    public void NextDialogue()
+    {
+        if (!dialogueActive)
+            return;
+
+        dialogueIndex++;
+        Sprite[] pictures = GetDialoguePictures(currentLevelIndex);
+        if (pictures == null || dialogueIndex >= pictures.Length)
+            FinishDialogue();
+        else
+            ShowDialogueFrame();
+    }
+
+    private void FinishDialogue()
+    {
+        if (!dialogueActive)
+            return;
+
+        dialogueActive = false;
+        if (dialogueClickArea != null)
+            dialogueClickArea.gameObject.SetActive(false);
+        if (dialogueImage != null)
+            dialogueImage.gameObject.SetActive(false);
+        HideOpenCrow();
+
+        if (!hasWon)
+        {
+            elapsedSeconds = 0f;
+            timerRunning = true;
+        }
+
+        WorldBus.SendPause(false);
     }
 
     private void OnWorldChanged(WorldStateInfo state)
     {
-        if (currentLevelIndex != state.levelIndex)
+        if (state.levelIndex != currentLevelIndex)
             return;
 
         if (state.hasWon)
         {
             hasWon = true;
             timerRunning = false;
-            HideHintVisuals();
-        }
-        else if (hasWon)
-        {
-            // Covers undoing a winning action in the final level.
-            hasWon = false;
-            if (elapsedSeconds >= hintDelaySeconds)
-                ShowHint();
-            else
-                timerRunning = true;
+            hintShown = false;
+            bool wasInDialogue = dialogueActive;
+            dialogueActive = false;
+            HideAllVisuals();
+            if (wasInDialogue)
+                WorldBus.SendPause(false);
         }
     }
 
-    private void ShowHint()
+    private void ShowTimedHint()
     {
-        hintShown = true;
         timerRunning = false;
-
-        if (autoOpenCrowOverlay != null)
-        {
-            if (openCrowSprite != null)
-                autoOpenCrowOverlay.sprite = openCrowSprite;
-
-            if (autoOpenCrowOverlay.sprite != null && originalCrowImage != autoOpenCrowOverlay)
-            {
-                autoOpenCrowOverlay.gameObject.SetActive(true);
-                SetOriginalCrowVisible(false); // hide only the original graphic, keep Button clickable
-            }
-            else
-                Debug.LogWarning("CrowHint: Open crow sprite is missing.");
-        }
-        else
-        {
-            Debug.LogWarning("CrowHint: Auto Open Crow Overlay is not assigned.");
-        }
+        hintShown = true;
+        ShowOpenCrow();
 
         if (hintImage == null)
         {
-            Debug.LogWarning("CrowHint: Hint Image is not assigned.");
+            Debug.LogWarning("CrowHint: Hint Image has not been assigned.");
             return;
         }
 
-        if (levelHintSprites == null ||
-            currentLevelIndex < 0 ||
+        if (levelHintSprites == null || currentLevelIndex < 0 ||
             currentLevelIndex >= levelHintSprites.Length ||
             levelHintSprites[currentLevelIndex] == null)
         {
-            Debug.LogWarning("CrowHint: Hint sprite missing for level index " + currentLevelIndex);
+            Debug.LogWarning("CrowHint: No timed hint sprite for level " + currentLevelIndex);
             hintImage.gameObject.SetActive(false);
             return;
         }
@@ -169,23 +260,48 @@ public class CrowHintController : MonoBehaviour
         hintImage.gameObject.SetActive(true);
     }
 
-    private void SetOriginalCrowVisible(bool visible)
+    private void ShowOpenCrow()
     {
-        if (originalCrowImage == null)
+        if (autoOpenCrowOverlay == null)
+        {
+            Debug.LogWarning("CrowHint: AutoOpenCrowOverlay is not assigned.");
             return;
-
-        Color color = originalCrowImage.color;
-        color.a = visible ? originalCrowAlpha : 0f;
-        originalCrowImage.color = color;
-        // Do not disable originalCrowImage or its GameObject: the Button needs it for clicks.
+        }
+        if (openCrowSprite != null)
+            autoOpenCrowOverlay.sprite = openCrowSprite;
+        if (autoOpenCrowOverlay.sprite == null || originalCrowImage == autoOpenCrowOverlay)
+        {
+            Debug.LogWarning("CrowHint: Open crow sprite is missing or overlay is not separate.");
+            return;
+        }
+        autoOpenCrowOverlay.gameObject.SetActive(true);
+        SetOriginalCrowVisible(false);
     }
 
-    private void HideHintVisuals()
+    private void HideOpenCrow()
     {
         SetOriginalCrowVisible(true);
         if (autoOpenCrowOverlay != null)
             autoOpenCrowOverlay.gameObject.SetActive(false);
+    }
+
+    private void SetOriginalCrowVisible(bool visible)
+    {
+        if (originalCrowImage == null)
+            return;
+        Color color = originalCrowImage.color;
+        color.a = visible ? originalCrowAlpha : 0f;
+        originalCrowImage.color = color;
+    }
+
+    private void HideAllVisuals()
+    {
+        HideOpenCrow();
         if (hintImage != null)
             hintImage.gameObject.SetActive(false);
+        if (dialogueImage != null)
+            dialogueImage.gameObject.SetActive(false);
+        if (dialogueClickArea != null)
+            dialogueClickArea.gameObject.SetActive(false);
     }
 }
