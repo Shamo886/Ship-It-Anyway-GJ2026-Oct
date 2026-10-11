@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,26 +11,38 @@ public class ProgrammingTestUI : MonoBehaviour
     [SerializeField] private Button bigPanel;
     [SerializeField] private Button smallPanel;
 
-    [Header("Slot Prefabs")]
-    [SerializeField] private GameObject commandSlotPrefab;
-    [SerializeField] private GameObject lockedSlotPrefab;
+    [Header("Big Package Prefabs")]
+    [SerializeField] private GameObject bigCommandSlotPrefab;
+    [SerializeField] private GameObject bigLockedSlotPrefab;
 
-    [Header("Command Sprites")]
-    [SerializeField] private Sprite emptySlotSprite;
-    [SerializeField] private Sprite upSprite;
-    [SerializeField] private Sprite downSprite;
-    [SerializeField] private Sprite leftSprite;
-    [SerializeField] private Sprite rightSprite;
-    [SerializeField] private Sprite callSmallSprite;
+    [Header("Small Package Prefabs")]
+    [SerializeField] private GameObject smallCommandSlotPrefab;
+    [SerializeField] private GameObject smallLockedSlotPrefab;
 
-    [Header("Test Selection Colors")]
-    [SerializeField]
-    private Color selectedColor =
-        new Color(0.15f, 0.55f, 0.4f, 1f);
+    [Header("Empty Slot Sprites")]
+    [SerializeField] private Sprite bigEmptySprite;
+    [SerializeField] private Sprite smallEmptySprite;
 
-    [SerializeField]
-    private Color normalColor =
-        new Color(0.27f, 0.27f, 0.27f, 1f);
+    [Header("Big Command Sprites")]
+    [SerializeField] private Sprite bigUpSprite;
+    [SerializeField] private Sprite bigDownSprite;
+    [SerializeField] private Sprite bigLeftSprite;
+    [SerializeField] private Sprite bigRightSprite;
+    [SerializeField] private Sprite bigCallSmallSprite;
+
+    [Header("Small Command Sprites")]
+    [SerializeField] private Sprite smallUpSprite;
+    [SerializeField] private Sprite smallDownSprite;
+    [SerializeField] private Sprite smallLeftSprite;
+    [SerializeField] private Sprite smallRightSprite;
+
+    [Header("Big Panel Sprites")]
+    [SerializeField] private Sprite bigNormalSprite;
+    [SerializeField] private Sprite bigSelectedSprite;
+
+    [Header("Small Panel Sprites")]
+    [SerializeField] private Sprite smallNormalSprite;
+    [SerializeField] private Sprite smallSelectedSprite;
 
     private readonly List<Image> bigImages =
         new List<Image>();
@@ -56,10 +67,15 @@ public class ProgrammingTestUI : MonoBehaviour
         if (manager == null ||
             bigPanel == null ||
             smallPanel == null ||
-            commandSlotPrefab == null ||
-            lockedSlotPrefab == null)
+            bigCommandSlotPrefab == null ||
+            bigLockedSlotPrefab == null ||
+            smallCommandSlotPrefab == null ||
+            smallLockedSlotPrefab == null)
         {
-            Debug.LogError("Missing Programming UI references!");
+            Debug.LogError(
+                "ProgrammingTestUI: Missing UI references!"
+            );
+
             enabled = false;
             return;
         }
@@ -68,6 +84,9 @@ public class ProgrammingTestUI : MonoBehaviour
             bigPanel.transform,
             manager.BigTotalSlots,
             manager.BigCapacity,
+            bigCommandSlotPrefab,
+            bigLockedSlotPrefab,
+            bigEmptySprite,
             bigImages
         );
 
@@ -75,6 +94,9 @@ public class ProgrammingTestUI : MonoBehaviour
             smallPanel.transform,
             manager.SmallTotalSlots,
             manager.SmallCapacity,
+            smallCommandSlotPrefab,
+            smallLockedSlotPrefab,
+            smallEmptySprite,
             smallImages
         );
 
@@ -95,21 +117,25 @@ public class ProgrammingTestUI : MonoBehaviour
 
     private void CreateSlots(
         Transform parent,
-        int total,
-        int unlocked,
+        int totalSlots,
+        int unlockedSlots,
+        GameObject normalPrefab,
+        GameObject lockedPrefab,
+        Sprite emptySprite,
         List<Image> images)
     {
         images.Clear();
 
-        for (int i = 0; i < total; i++)
+        for (int i = 0; i < totalSlots; i++)
         {
-            bool locked = i >= unlocked;
+            bool locked = i >= unlockedSlots;
 
             GameObject prefab = locked
-                ? lockedSlotPrefab
-                : commandSlotPrefab;
+                ? lockedPrefab
+                : normalPrefab;
 
-            GameObject slot = Instantiate(prefab, parent, false);
+            GameObject slot =
+                Instantiate(prefab, parent, false);
 
             slot.name = locked
                 ? "LockedSlot_" + (i + 1)
@@ -128,16 +154,16 @@ public class ProgrammingTestUI : MonoBehaviour
                 slot.GetComponent<LayoutElement>();
 
             if (layout != null)
+            {
                 layout.ignoreLayout = false;
+            }
 
-            // Allow clicks to pass through to Panel.
             foreach (Graphic graphic in
-                slot.GetComponentsInChildren<Graphic>())
+                slot.GetComponentsInChildren<Graphic>(true))
             {
                 graphic.raycastTarget = false;
             }
 
-            // Locked slots keep their own prefab appearance.
             if (locked)
                 continue;
 
@@ -146,40 +172,60 @@ public class ProgrammingTestUI : MonoBehaviour
             if (image == null)
             {
                 Debug.LogError(
-                    "CommandSlot prefab needs an Image component!"
+                    slot.name + ": Missing Image component!"
                 );
                 continue;
             }
 
+            image.sprite = emptySprite;
             image.color = Color.white;
-            image.sprite = emptySlotSprite;
 
             images.Add(image);
         }
     }
 
-    // Choose the correct image for each command.
-    private Sprite GetCommandSprite(GameCommand command)
+    private Sprite GetBigCommandSprite(GameCommand command)
     {
         switch (command)
         {
             case GameCommand.Up:
-                return upSprite;
+                return bigUpSprite;
 
             case GameCommand.Down:
-                return downSprite;
+                return bigDownSprite;
 
             case GameCommand.Left:
-                return leftSprite;
+                return bigLeftSprite;
 
             case GameCommand.Right:
-                return rightSprite;
+                return bigRightSprite;
 
             case GameCommand.CallSmall:
-                return callSmallSprite;
+                return bigCallSmallSprite;
 
             default:
-                return emptySlotSprite;
+                return null;
+        }
+    }
+
+    private Sprite GetSmallCommandSprite(GameCommand command)
+    {
+        switch (command)
+        {
+            case GameCommand.Up:
+                return smallUpSprite;
+
+            case GameCommand.Down:
+                return smallDownSprite;
+
+            case GameCommand.Left:
+                return smallLeftSprite;
+
+            case GameCommand.Right:
+                return smallRightSprite;
+
+            default:
+                return null;
         }
     }
 
@@ -188,35 +234,65 @@ public class ProgrammingTestUI : MonoBehaviour
         if (manager == null)
             return;
 
-        UpdateSlots(bigImages, manager.BigPackage);
-        UpdateSlots(smallImages, manager.SmallPackage);
+        UpdateBigSlots();
+        UpdateSmallSlots();
+        UpdatePanelSprites();
+    }
 
+    private void UpdateBigSlots()
+    {
+        for (int i = 0; i < bigImages.Count; i++)
+        {
+            if (i < manager.BigPackage.Count)
+            {
+                bigImages[i].sprite =
+                    GetBigCommandSprite(manager.BigPackage[i]);
+            }
+            else
+            {
+                bigImages[i].sprite = bigEmptySprite;
+            }
+
+            bigImages[i].color = Color.white;
+        }
+    }
+
+    private void UpdateSmallSlots()
+    {
+        for (int i = 0; i < smallImages.Count; i++)
+        {
+            if (i < manager.SmallPackage.Count)
+            {
+                smallImages[i].sprite =
+                    GetSmallCommandSprite(manager.SmallPackage[i]);
+            }
+            else
+            {
+                smallImages[i].sprite = smallEmptySprite;
+            }
+
+            smallImages[i].color = Color.white;
+        }
+    }
+
+    private void UpdatePanelSprites()
+    {
         if (bigPanel != null && bigPanel.image != null)
         {
-            bigPanel.image.color =
-                editingBig ? selectedColor : normalColor;
+            bigPanel.image.sprite = editingBig
+                ? bigSelectedSprite
+                : bigNormalSprite;
+
+            bigPanel.image.color = Color.white;
         }
 
         if (smallPanel != null && smallPanel.image != null)
         {
-            smallPanel.image.color =
-                editingBig ? normalColor : selectedColor;
-        }
-    }
+            smallPanel.image.sprite = editingBig
+                ? smallNormalSprite
+                : smallSelectedSprite;
 
-    // Update the Image component instead of TMP text.
-    private void UpdateSlots(
-        List<Image> images,
-        IReadOnlyList<GameCommand> commands)
-    {
-        for (int i = 0; i < images.Count; i++)
-        {
-            Sprite sprite = i < commands.Count
-                ? GetCommandSprite(commands[i])
-                : emptySlotSprite;
-
-            images[i].sprite = sprite;
-            images[i].color = Color.white;
+            smallPanel.image.color = Color.white;
         }
     }
 
@@ -269,8 +345,10 @@ public class ProgrammingTestUI : MonoBehaviour
 
     public void CallSmall()
     {
-        if (manager != null)
-            manager.AddBigCommand(GameCommand.CallSmall);
+        if (manager == null)
+            return;
+
+        manager.AddBigCommand(GameCommand.CallSmall);
     }
 
     public void Undo()
@@ -279,8 +357,12 @@ public class ProgrammingTestUI : MonoBehaviour
             return;
 
         if (editingBig)
+        {
             manager.Undo();
+        }
         else
+        {
             manager.UndoSmall();
+        }
     }
 }
