@@ -1847,7 +1847,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 1823103414}
   creditsPanel: {fileID: 1246277260}
   nameInput: {fileID: 0}
-  nextSceneName: YiScene
+  nextSceneName: AmareScene
 --- !u!4 &952123483
 Transform:
   m_ObjectHideFlags: 0
