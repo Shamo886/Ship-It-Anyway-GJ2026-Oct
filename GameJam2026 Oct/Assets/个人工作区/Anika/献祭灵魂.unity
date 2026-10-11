@@ -1252,7 +1252,7 @@ MonoBehaviour:
   creditsScrollRect: {fileID: 726371810}
   delayBeforeCredits: 10
   scrollSpeed: 0.01
-  startSceneName: TessaStartScene
+  startSceneName: "\u4E3B\u9875Start"
 --- !u!4 &1120194463
 Transform:
   m_ObjectHideFlags: 0

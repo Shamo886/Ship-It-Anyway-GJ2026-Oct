@@ -2130,7 +2130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7796542938c1d24b88ad55cfdfc5588, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameplayMenuManager
-  homeSceneName: TessaStartScene
+  homeSceneName: "\u4E3B\u9875Start"
   helpPanel: {fileID: 678687486}
   volumePanel: {fileID: 0}
   programmingManager: {fileID: 1043266258}

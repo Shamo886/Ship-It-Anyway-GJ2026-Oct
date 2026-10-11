@@ -306,7 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 943aa3a862e7f264bb83a45a278ca972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VintageFilmEffect
-  targetCanvas: {fileID: 0}
+  targetCanvas: {fileID: 379455579}
   vignetteStrength: 0.12
   vignetteSize: 0.85
   grainStrength: 0.005
@@ -2643,7 +2643,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 1823103414}
   creditsPanel: {fileID: 1154654889}
   nameInput: {fileID: 0}
-  nextSceneName: AmareScene
+  nextSceneName: "\u6E38\u73A9"
 --- !u!4 &952123483
 Transform:
   m_ObjectHideFlags: 0
