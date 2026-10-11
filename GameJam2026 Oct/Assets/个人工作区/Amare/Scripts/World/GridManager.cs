@@ -20,6 +20,9 @@ public class GridManager : MonoBehaviour
     [SerializeField] private GameObject cellPrefab;
     [SerializeField] private bool showDebugCells = true;
 
+    [Header("Start Tile Art")]
+    [SerializeField] private Sprite startTileSprite;
+
     [Header("Special tiles")]
     [SerializeField] private Transform specialTilesRoot;
     [SerializeField] private GameObject specialTilePrefab;
@@ -98,20 +101,41 @@ public class GridManager : MonoBehaviour
                         roadArt = level.roadSpriteA != null
                             ? level.roadSpriteA : level.roadSpriteB;
 
-                    if (useRoadArt && roadArt != null)
-                    {
-                        sr.sprite = roadArt;
-                        sr.color = Color.white; // no gray/red tint on imported art
+                        // Start Tile
+                        if (type == 'S' && startTileSprite != null)
+                        {
+                            sr.sprite = startTileSprite;
+                            sr.color = Color.white;
+
+                            // Automatically fit the sprite inside one grid cell
+                            Vector3 spriteSize = sr.sprite.bounds.size;
+
+                            if (spriteSize.x > 0f && spriteSize.y > 0f)
+                            {
+                                float scale = Mathf.Min(
+                                    CellSize * 0.96f / spriteSize.x,
+                                    CellSize * 0.96f / spriteSize.y
+                                );
+
+                                obj.transform.localScale =
+                                    new Vector3(scale, scale, 1f);
+                            }
+                        }
+                        // Normal Road
+                        else if (useRoadArt && roadArt != null)
+                        {
+                            sr.sprite = roadArt;
+                            sr.color = Color.white;
+                        }
+                        // Other Tiles
+                        else
+                        {
+                            sr.color = type == 'S' ? new Color(0.45f, 0.85f, 0.55f) :
+                                       type == 'G' ? new Color(1f, 0.78f, 0.30f) :
+                                       type == 'W' ? new Color(0.3f, 0.3f, 0.35f) :
+                                       new Color(0.78f, 0.80f, 0.86f);
+                        }
                     }
-                    else
-                    {
-                        // Preserve original test colors for start, goal, and walls.
-                        sr.color = type == 'S' ? new Color(0.45f, 0.85f, 0.55f) :
-                                   type == 'G' ? new Color(1f, 0.78f, 0.30f) :
-                                   type == 'W' ? new Color(0.3f, 0.3f, 0.35f) :
-                                   new Color(0.78f, 0.80f, 0.86f);
-                    }
-                }
             }
 
             if (type == 'T' || type == 't')
