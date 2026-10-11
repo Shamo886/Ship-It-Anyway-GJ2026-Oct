@@ -21,4 +21,7 @@ T#..T##
 
     [Min(0.01f)]
     public float cellSize = 1f;
+
+    [Header("Level Position")]
+    public Vector2 positionOffset = Vector2.zero;
 }

@@ -1595,9 +1595,13 @@ MonoBehaviour:
   gridManager: {fileID: 365286356}
   playerMover: {fileID: 258573888}
   levels:
+  - {fileID: 11400000, guid: f93b4c63fa16e6b448f7c5b457dc0c03, type: 2}
   - {fileID: 11400000, guid: d657ecb2062a98f4aafc1fc37911c15b, type: 2}
   - {fileID: 11400000, guid: 9aa6438538197be41968815becb8fccb, type: 2}
-  initialLevelIndex: 0
+  - {fileID: 11400000, guid: ff93c8481b722864ea4a7b97a132aab8, type: 2}
+  - {fileID: 11400000, guid: b0ebed52209a5cc4988b6683b9239dea, type: 2}
+  - {fileID: 11400000, guid: 08c411d6e39493440a3ca52f8db935b8, type: 2}
+  initialLevelIndex: 5
   blockedStepDelay: 0.22
   showTestButtons: 0
 --- !u!1 &974142027
@@ -2354,7 +2358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelAdvanceController
   programmingManager: {fileID: 1043266258}
-  levelCount: 2
+  levelCount: 6
 --- !u!4 &1301475731
 Transform:
   m_ObjectHideFlags: 0

@@ -74,7 +74,10 @@ public class WorldSimulator
                 raisedStates[p] = !raisedStates[p];
         }
 
-        if (canEnter && PlayerCell == grid.GoalCell) HasWon = true;
+        if (canEnter && grid.GetCellType(PlayerCell) == 'G')
+        {
+            HasWon = true;
+        }
 
         return new WorldStepResult
         {

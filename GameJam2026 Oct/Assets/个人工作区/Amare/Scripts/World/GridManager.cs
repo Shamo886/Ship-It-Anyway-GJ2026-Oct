@@ -7,6 +7,13 @@ public class GridManager : MonoBehaviour
     [Header("Grid: origin is the center of bottom-left cell")]
     [SerializeField] private Transform gridOrigin;
 
+    private Vector3 originalGridOriginPosition;
+
+    private void Awake()
+    {
+        originalGridOriginPosition = gridOrigin.localPosition;
+    }
+
     [Header("Art and optional debug grid")]
     [SerializeField] private SpriteRenderer boardArt;
     [SerializeField] private Transform boardVisuals;
@@ -35,6 +42,16 @@ public class GridManager : MonoBehaviour
             throw new Exception("GridManager: assign level, GridOrigin, BoardVisuals, SpecialTiles, and SpecialTilePrefab.");
 
         currentLevel = level;
+
+        // Apply the position offset for this level
+        gridOrigin.localPosition =
+            originalGridOriginPosition +
+            new Vector3(
+                level.positionOffset.x,
+                level.positionOffset.y,
+                0f
+            );
+
         ParseMap(level.map);
 
         ClearChildren(boardVisuals);
@@ -134,8 +151,10 @@ public class GridManager : MonoBehaviour
                 if (c == 'G') { GoalCell = cell; goals++; }
             }
         }
-        if (starts != 1 || goals != 1)
-            throw new Exception("Map must contain exactly one S and one G.");
+        if (starts != 1 || goals < 1)
+            throw new Exception(
+                "Map must contain exactly one S and at least one G."
+            );
     }
 
     private static void ClearChildren(Transform parent)
