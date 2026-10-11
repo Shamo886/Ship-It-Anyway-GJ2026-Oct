@@ -1248,6 +1248,7 @@ MonoBehaviour:
   homeSceneName: TessaStartScene
   helpPanel: {fileID: 678687486}
   volumePanel: {fileID: 0}
+  programmingManager: {fileID: 1043266258}
 --- !u!1 &559525401
 GameObject:
   m_ObjectHideFlags: 0
