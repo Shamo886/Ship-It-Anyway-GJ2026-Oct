@@ -2196,6 +2196,7 @@ Transform:
   - {fileID: 667833896}
   - {fileID: 1722888088}
   - {fileID: 258573887}
+  - {fileID: 807493282}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &803702038
@@ -2246,7 +2247,9 @@ MonoBehaviour:
   - pictures:
     - {fileID: 21300000, guid: 93b634fe926c9d04baada4f1c9727154, type: 3}
     - {fileID: 21300000, guid: 4b13105cee8ce264385f915ab52f48b7, type: 3}
-  - pictures: []
+  - pictures:
+    - {fileID: 21300000, guid: a6d9a01c54106264da53fb94c0c9632a, type: 3}
+    - {fileID: 21300000, guid: c3a492a59785d274098838d132ba8bb5, type: 3}
   - pictures:
     - {fileID: 21300000, guid: a9a0dab4dd2cbbf4b97f274e1cf3fb8c, type: 3}
     - {fileID: 21300000, guid: 7ac511f988a9b124796e62413fe682dc, type: 3}
@@ -2257,7 +2260,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5af7e6d9354fb8e42ad4268a341cbc95, type: 3}
   - {fileID: 21300000, guid: 19306df687cccdd409db139fc4b8cb3f, type: 3}
   - {fileID: 21300000, guid: c30481a1e8efdf74a8b271cb11ad5882, type: 3}
-  hintDelaySeconds: 30
+  hintDelaySeconds: 5
 --- !u!4 &803702040
 Transform:
   m_ObjectHideFlags: 0
@@ -2273,6 +2276,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &807493281
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 807493282}
+  - component: {fileID: 807493283}
+  m_Layer: 0
+  m_Name: FinalGoalBranching
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &807493282
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807493281}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 780971835}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &807493283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 807493281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240498a7bcd0e0a469d0d805fc16b43d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FinalGoalBranching
+  gridManager: {fileID: 365286356}
+  finalLevelIndex: 5
+  goalACell: {x: 5, y: 6}
+  goalASprite: {fileID: 21300000, guid: 4e30ae9d5325bc84d8593632ea32507e, type: 3}
+  goalASceneName: "\u732E\u796D\u8089\u4F53"
+  goalBCell: {x: 7, y: 2}
+  goalBSprite: {fileID: 21300000, guid: b82aed1121b0abe4080132d5c886e6ed, type: 3}
+  goalBSceneName: "\u732E\u796D\u7075\u9B42"
+  tileSize: 1.25
+  sortingOrder: 5
 --- !u!1 &843560283
 GameObject:
   m_ObjectHideFlags: 0
@@ -3182,6 +3239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WorldController
   gridManager: {fileID: 365286356}
   playerMover: {fileID: 258573888}
+  finalGoalBranching: {fileID: 807493283}
   levels:
   - {fileID: 11400000, guid: f93b4c63fa16e6b448f7c5b457dc0c03, type: 2}
   - {fileID: 11400000, guid: d657ecb2062a98f4aafc1fc37911c15b, type: 2}
@@ -3189,7 +3247,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ff93c8481b722864ea4a7b97a132aab8, type: 2}
   - {fileID: 11400000, guid: b0ebed52209a5cc4988b6683b9239dea, type: 2}
   - {fileID: 11400000, guid: 08c411d6e39493440a3ca52f8db935b8, type: 2}
-  initialLevelIndex: 0
+  initialLevelIndex: 5
   blockedStepDelay: 0.22
   showTestButtons: 0
 --- !u!1 &974142027
@@ -4646,8 +4704,8 @@ MonoBehaviour:
   smallRightSprite: {fileID: 21300000, guid: a71b9010f9db5f643ba2c58e0fc266da, type: 3}
   bigNormalSprite: {fileID: 21300000, guid: eb5d4dc4197ec184ead7235c1083a252, type: 3}
   bigSelectedSprite: {fileID: 21300000, guid: e94df19ea8b75d741b55772547b9c013, type: 3}
-  smallNormalSprite: {fileID: 21300000, guid: 58c59cc4d0c95074f80145953f40f69a, type: 3}
-  smallSelectedSprite: {fileID: 21300000, guid: bb6abb08ca816cd47badee678901d046, type: 3}
+  smallNormalSprite: {fileID: 21300000, guid: f5b4f2a19bc374b40afd1115f7389579, type: 3}
+  smallSelectedSprite: {fileID: 21300000, guid: d178730cc3b5962429bb94948a04a55e, type: 3}
 --- !u!114 &1346954516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4742,6 +4800,7 @@ RectTransform:
   - {fileID: 1441103549}
   - {fileID: 843560284}
   - {fileID: 1005527926}
+  - {fileID: 2101274739}
   - {fileID: 108953096}
   - {fileID: 1568776505}
   - {fileID: 687609020}
@@ -4751,7 +4810,6 @@ RectTransform:
   - {fileID: 180589948}
   - {fileID: 678687487}
   - {fileID: 1726345849}
-  - {fileID: 2101274739}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5302,7 +5360,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 816, y: -313}
+  m_AnchoredPosition: {x: 816, y: -170}
   m_SizeDelta: {x: 524, y: 855}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1557627442
