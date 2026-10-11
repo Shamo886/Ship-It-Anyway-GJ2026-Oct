@@ -8,6 +8,9 @@ public class WorldController : MonoBehaviour
     [SerializeField] private GridManager gridManager;
     [SerializeField] private PlayerMover playerMover;
 
+    [Header("Final Level Ending")]
+    [SerializeField] private FinalGoalBranching finalGoalBranching;
+
     [Header("Levels")]
     [SerializeField] private LevelData[] levels;
     [SerializeField] private int initialLevelIndex = 0;
@@ -185,7 +188,23 @@ public class WorldController : MonoBehaviour
             stepsProcessed = processed,
             reachedGoal = simulator.HasWon
         });
-        if (simulator.HasWon) WorldBus.ReportVictory(CurrentState());
+
+        if (simulator.HasWon)
+        {
+            bool handledByEnding =
+                finalGoalBranching != null &&
+                finalGoalBranching.TryHandleWin(
+                    currentLevelIndex,
+                    simulator.PlayerCell
+                );
+
+            // Normal levels still use the existing victory system.
+            if (!handledByEnding)
+            {
+                WorldBus.ReportVictory(CurrentState());
+            }
+        }
+
     }
 
     private void OnUndoRequested(int id)
